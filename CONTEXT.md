@@ -8,7 +8,7 @@ Sistema de semáforo solar inteligente (solmáforo) con ESP32 conectado a red ce
 - **Módulo GSM/LTE**: SIM7000G
 - **Módulo LoRa**: SX1276/RFM95 (868/915MHz)
 - **Display**: Matriz LED 4x8x8 (MAX7219)
-- **Sensor Corriente**: INA219 (más preciso que ACS712)
+- **Sensor Corriente**: INA219 (preciso, 32V/2A)
 - **Sensores**: 
   - Voltaje batería (divisor 100K/100K)
   - Voltaje panel solar (divisor 470K/100K)
@@ -18,7 +18,7 @@ Sistema de semáforo solar inteligente (solmáforo) con ESP32 conectado a red ce
   - Sensor Lluvia (FC-37)
   - Sensor Viento (anemómetro)
   - GPS (integrado en SIM7000G)
-- **Almacenamiento**: SD Card (SPI)
+- **Almacenamiento**: SD Card (_SPI deshabilitado por incompatibilidad_)
 - **Actuadores**: 3 LEDs semáforo + 5 LEDs indicador UV
 
 ## Estados del Proyecto
@@ -45,14 +45,16 @@ Sistema de semáforo solar inteligente (solmáforo) con ESP32 conectado a red ce
 - ✅ **Sensor Viento (anemómetro)**
 - ✅ **LoRaWAN (SX1276/RFM95)**
 - ✅ **WiFi backup**
-- ✅ **SD Card para logs**
 - ✅ **Estadísticas de energía (Wh)**
 - ✅ **Display muestra UV, Solar, Ambiente, Semáforo**
+- ✅ **Compilación verificada**
 
 ## Estructura de Archivos
 ```
 SEMAFORO-SOLAR/
 ├── platformio.ini          # Configuración del proyecto
+├── CONTEXT.md               # Documentación del proyecto
+├── README.md                # README del proyecto
 ├── src/
 │   ├── main.cpp           # Código principal
 │   ├── sensores.cpp       # Gestión INA219, voltaje, NTC
@@ -68,7 +70,6 @@ SEMAFORO-SOLAR/
 ├── lib/                   
 ├── include/               
 └── test/                  
-
 ```
 
 ## Librerías en uso
@@ -80,9 +81,8 @@ SEMAFORO-SOLAR/
 | MD_Parola | 3.7.5 | Animaciones display |
 | DHT sensor library | 1.4.7 | Sensor temperatura/humedad |
 | Adafruit Unified Sensor | 1.1.15 | Sensor unified |
-| Adafruit INA219 | 1.2.1 | Medición corriente/potencia precisa |
+| Adafruit INA219 | 1.2.3 | Medición corriente/potencia precisa |
 | LoRa (SandeepMistry) | 0.8.0 | Comunicación LoRaWAN |
-| Adafruit SD | 1.2.4 | Almacenamiento SD card |
 | ArduinoOTA | 2.0.0 | Actualizaciones OTA |
 | Preferences | 2.0.0 | Almacenamiento NVS |
 | WebServer | 2.0.0 | Panel web embebido |
@@ -98,12 +98,10 @@ SEMAFORO-SOLAR/
 | 12 | LED Rojo semáforo / LED UV Rojo |
 | 13 | LED Amarillo semáforo / LED UV Amarillo |
 | 14 | LED Verde semáforo / LED UV Verde |
-| 32 | Sensor Corriente (ACS712 legacy) |
 | 34 | Sensor Voltaje Batería |
 | 35 | Sensor Voltaje Panel Solar |
 | 33 | Sensor DHT11 |
 | 36 | Sensor NTC Temperatura Batería |
-| 15 | CS SD Card |
 | 2 | LoRa MOSI |
 | 16 | LoRa MISO |
 | 17 | LoRa SCK |
@@ -152,6 +150,18 @@ enum ModoOperacion {
 | BAJO | < 11.5V | Modo mínimo |
 | CRÍTICO | < 11.0V | Deep sleep inmediato (10 min) |
 
+## Variables Globales (definidas en main.cpp)
+```cpp
+float BATERIA_CRITICA = 11.0;
+float BATERIA_BAJA = 11.5;
+float BATERIA_ADVERTENCIA = 12.0;
+float BATERIA_NORMAL = 12.5;
+
+unsigned long TIEMPO_ROJO = 30000;
+unsigned long TIEMPO_VERDE = 25000;
+unsigned long TIEMPO_AMARILLO = 5000;
+```
+
 ## Topics MQTT
 | Topic | Dirección | Contenido |
 |-------|-----------|-----------|
@@ -184,10 +194,10 @@ enum ModoOperacion {
 }
 ```
 
-## Configuración Solar (Original + INA219)
+## Configuración Solar
 - **Divisor Batería**: R1=100K, R2=100K (factor 2.0)
 - **Divisor Panel**: R1=470K, R2=100K (factor 5.7)
-- **INA219**: Dirección 0x40, shunt 0.1Ω, max 0.4A
+- **INA219**: Dirección 0x40, calibración 32V/2A
 - **Rango Batería**: 10.5V (0%) a 13.0V (100%)
 
 ## Configuración NTC Batería
@@ -275,9 +285,9 @@ enum ModoOperacion {
 | Batería baja sin sol | 300 segundos |
 | Temperatura extrema | 300 segundos |
 
-## Uso de Memoria (estimado)
-- **RAM**: ~45KB
-- **Flash**: ~600KB
+## Uso de Memoria (compilación real)
+- **RAM**: 10.6% (34,836 bytes de 327,680 bytes)
+- **Flash**: 42.4% (556,133 bytes de 1,310,720 bytes)
 
 ## Compilación
 ```bash
@@ -308,10 +318,16 @@ pio device monitor          # Monitor serial
 
 ## RTC Memory (persiste en deep sleep)
 - `wakeUpCount` - Contador de despertares
-- `lastBateriaCritica` - Timestamp última crítica
-- `lastGPSlat` - Última latitud conocida
-- `lastGPSlon` - Última longitud conocida
+
+## Errores Corregidos en Compilación
+1. INA219: `setCalibration()` → `setCalibration_32V_2A()`
+2. Multiple definitions: Variables definidas como `extern` en config.h e inicializadas en main.cpp
+3. Pin names: Agregado alias `PIN_SENSOR_Viento` en config.h
 
 ## Ubicación de Uso
 - **Ciudad**: Renca, Santiago, Chile
 - **Características**: Zona con alta radiación UV, clima mediterráneo
+
+## Repositorio
+- **URL**: https://github.com/palbina/semaforo-solar-esp32
+- **Último commit**: Fix compilation errors: INA219, multiple definitions, pin names
