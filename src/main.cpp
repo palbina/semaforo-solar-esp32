@@ -11,6 +11,7 @@
 #include <ArduinoOTA.h>
 #include <WebServer.h>
 #include <Wire.h>
+#include <SPIFFS.h>
 
 #include "config.h"
 #include "sensores.h"
@@ -395,12 +396,42 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
 }
 
 bool iniciarSDCard() {
-    Serial.println("SD Card no disponible en esta version");
-    return false;
+    if (!SPIFFS.begin(true)) {
+        Serial.println("ERROR: No se pudo inicializar SPIFFS");
+        return false;
+    }
+    Serial.println("SPIFFS inicializado");
+    
+    File root = SPIFFS.open("/");
+    if (!root) {
+        Serial.println("ERROR: No se pudo abrir raiz SPIFFS");
+        return false;
+    }
+    
+    File file = root.openNextFile();
+    if (!file) {
+        Serial.println("Creando archivo de logs...");
+        File logFile = SPIFFS.open("/log.txt", FILE_WRITE);
+        if (logFile) {
+            logFile.println("=== Log SPIFFS Inicializado ===");
+            logFile.close();
+            Serial.println("Archivo log.txt creado");
+        }
+    }
+    root.close();
+    
+    Serial.println("SPIFFS listo para uso");
+    return true;
 }
 
 void escribirLogSD(const char* mensaje) {
-    Serial.println(mensaje);
+    File logFile = SPIFFS.open("/log.txt", FILE_APPEND);
+    if (logFile) {
+        logFile.print(millis());
+        logFile.print(": ");
+        logFile.println(mensaje);
+        logFile.close();
+    }
 }
 
 NivelUV evaluarNivelUV(float indiceUV) {

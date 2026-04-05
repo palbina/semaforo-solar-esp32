@@ -18,7 +18,7 @@ Sistema de semáforo solar inteligente (solmáforo) con ESP32 conectado a red ce
   - Sensor Lluvia (FC-37)
   - Sensor Viento (anemómetro)
   - GPS (integrado en SIM7000G)
-- **Almacenamiento**: SD Card (_SPI deshabilitado por incompatibilidad_)
+- **Almacenamiento**: SPIFFS (filesystem interno ESP32)
 - **Actuadores**: 3 LEDs semáforo + 5 LEDs indicador UV
 
 ## Estados del Proyecto
@@ -83,6 +83,7 @@ SEMAFORO-SOLAR/
 | Adafruit Unified Sensor | 1.1.15 | Sensor unified |
 | Adafruit INA219 | 1.2.3 | Medición corriente/potencia precisa |
 | LoRa (SandeepMistry) | 0.8.0 | Comunicación LoRaWAN |
+| SPIFFS | 2.0.0 | Filesystem interno ESP32 |
 | ArduinoOTA | 2.0.0 | Actualizaciones OTA |
 | Preferences | 2.0.0 | Almacenamiento NVS |
 | WebServer | 2.0.0 | Panel web embebido |
@@ -286,8 +287,8 @@ unsigned long TIEMPO_AMARILLO = 5000;
 | Temperatura extrema | 300 segundos |
 
 ## Uso de Memoria (compilación real)
-- **RAM**: 10.6% (34,836 bytes de 327,680 bytes)
-- **Flash**: 42.4% (556,133 bytes de 1,310,720 bytes)
+- **RAM**: 10.6% (34,860 bytes de 327,680 bytes)
+- **Flash**: 44.9% (589,157 bytes de 1,310,720 bytes)
 
 ## Compilación
 ```bash
