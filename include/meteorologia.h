@@ -2,6 +2,7 @@
 #define METEOROLOGIA_H
 
 #include <Arduino.h>
+#include "config.h"
 #include <driver/timer.h>
 
 struct DatosMeteorologicos {

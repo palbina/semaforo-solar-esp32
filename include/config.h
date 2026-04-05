@@ -51,7 +51,8 @@
 
 // ============= SENSORES METEOROLÓGICOS =============
 #define PIN_SENSOR_LLUVIA 21
-#define PIN_SENSOR_VIENTO 22
+#define PIN_SENSOR_Viento 22
+#define PIN_SENSOR_Viento 22
 #define PIN_SENSOR_UV 39
 
 // ============= MQTT =============
@@ -99,10 +100,10 @@ const float NTC_REF_TEMP = 25.0;
 const float NTC_REF_RES = 10000.0;
 
 // ============= NIVELES BATERÍA =============
-float BATERIA_CRITICA = 11.0;
-float BATERIA_BAJA = 11.5;
-float BATERIA_ADVERTENCIA = 12.0;
-float BATERIA_NORMAL = 12.5;
+extern float BATERIA_CRITICA;
+extern float BATERIA_BAJA;
+extern float BATERIA_ADVERTENCIA;
+extern float BATERIA_NORMAL;
 
 // ============= TEMPERATURA BATERÍA =============
 #define TEMP_BATERIA_MIN 0.0
@@ -113,9 +114,9 @@ float BATERIA_NORMAL = 12.5;
 #define DEEPSLEEP_CRITICO_SEGUNDOS 600
 
 // ============= TIEMPOS SEMÁFORO =============
-unsigned long TIEMPO_ROJO = 30000;
-unsigned long TIEMPO_VERDE = 25000;
-unsigned long TIEMPO_AMARILLO = 5000;
+extern unsigned long TIEMPO_ROJO;
+extern unsigned long TIEMPO_VERDE;
+extern unsigned long TIEMPO_AMARILLO;
 
 // ============= INA219 =============
 #define INA219_ADDRESS 0x40

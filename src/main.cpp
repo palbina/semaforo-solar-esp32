@@ -10,7 +10,6 @@
 #include <Preferences.h>
 #include <ArduinoOTA.h>
 #include <WebServer.h>
-#include <SD.h>
 #include <Wire.h>
 
 #include "config.h"
@@ -18,6 +17,15 @@
 #include "meteorologia.h"
 #include "comunicaciones.h"
 #include "energia.h"
+
+float BATERIA_CRITICA = 11.0;
+float BATERIA_BAJA = 11.5;
+float BATERIA_ADVERTENCIA = 12.0;
+float BATERIA_NORMAL = 12.5;
+
+unsigned long TIEMPO_ROJO = 30000;
+unsigned long TIEMPO_VERDE = 25000;
+unsigned long TIEMPO_AMARILLO = 5000;
 
 HardwareSerial SerialAT(1);
 TinyGsm modem(SerialAT);
@@ -36,13 +44,15 @@ Energia energia;
 
 RTC_DATA_ATTR uint32_t wakeUpCount = 0;
 
+NivelUV evaluarNivelUV(float indiceUV);
+
 EstadoSemaforo estadoActual = ESTADO_ROJO;
 unsigned long ultimoCambio = 0;
 
 bool gsmConectado = false;
 bool mqttConectado = false;
 
-DatosSolar datosSolar = {0, 0, 0, 0, 0, 0, 0, 0};
+DatosSolar datosSolar = {0, 0, 0, 0, 0, 0, 0};
 DatosAmbiente datosAmbiente = {0, 0};
 DatosMeteorologicos datosMeteo = {LLUVIA_SECO, 0, 0, false, false};
 DatosGPS datosGPS = {0, 0, false};
@@ -385,20 +395,12 @@ void callbackMQTT(char* topic, byte* payload, unsigned int length) {
 }
 
 bool iniciarSDCard() {
-    if (!SD.begin(PIN_CS_SD)) {
-        Serial.println("ERROR: No se pudo inicializar SD card");
-        return false;
-    }
-    Serial.println("SD card inicializada");
-    return true;
+    Serial.println("SD Card no disponible en esta version");
+    return false;
 }
 
 void escribirLogSD(const char* mensaje) {
-    File logFile = SD.open("/log.txt", FILE_APPEND);
-    if (logFile) {
-        logFile.println(mensaje);
-        logFile.close();
-    }
+    Serial.println(mensaje);
 }
 
 NivelUV evaluarNivelUV(float indiceUV) {

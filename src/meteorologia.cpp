@@ -10,11 +10,11 @@ void IRAM_ATTR contarPulsoVientoISR() {
 
 void Meteorologia::init() {
     pinMode(PIN_SENSOR_LLUVIA, INPUT);
-    pinMode(PIN_SENSOR_VIENTo, INPUT_PULLUP);
+    pinMode(PIN_SENSOR_Viento, INPUT_PULLUP);
     
-    attachInterrupt(PIN_SENSOR_VIENTo, contarPulsoVientoISR, FALLING);
+    attachInterrupt(PIN_SENSOR_Viento, contarPulsoVientoISR, FALLING);
     
-    Serial.println("Sensores meteorológicos inicializados");
+    Serial.println("Sensores meteorologicos inicializados");
 }
 
 EstadoLluvia Meteorologia::leerSensorLluvia() {
@@ -36,21 +36,21 @@ float Meteorologia::leerSensorViento() {
     
     if (tiempoTranscurrido == 0) return 0.0;
     
-    float revoluciones = (float)pulsos / VIENTO_PULSOS_REVOLUCION;
+    float revoluciones = (float)pulsos / 1;
     float rpm = (revoluciones * 60000.0) / tiempoTranscurrido;
     
-    float velocidad = (rpm * DIAMETRO_ANEMOMETRO_CM * 0.014) / 60.0;
+    float velocidad = (rpm * 9.0 * 0.014) / 60.0;
     
     return velocidad;
 }
 
 float Meteorologia::leerSensorUV() {
-    int rawADC = analogRead(PIN_SENSOR_UV);
-    float voltaje = (rawADC * VOLTAJE_REFERENCIA) / ADC_RESOLUTION;
+    int rawADC = analogRead(39);
+    float voltaje = (rawADC * 3.3) / 4095;
     
-    float indiceUV = (voltaje / UV_MAX_VOLTAGE) * UV_MAX_INDEX;
+    float indiceUV = (voltaje / 3.3) * 11.0;
     
-    return constrain(indiceUV, 0.0, UV_MAX_INDEX);
+    return constrain(indiceUV, 0.0, 11.0);
 }
 
 DatosMeteorologicos Meteorologia::leerDatos() {

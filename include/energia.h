@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include "config.h"
 
 struct EnergiaStats {
     float whConsumidos;

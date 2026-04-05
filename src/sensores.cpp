@@ -6,9 +6,9 @@ extern DHT dht;
 
 void Sensores::init() {
     if (!ina219.begin()) {
-        Serial.println("ERROR: No se encontró INA219");
+        Serial.println("ERROR: No se encontro INA219");
     } else {
-        ina219.setCalibration(0x1000, 0x4000);
+        ina219.setCalibration_32V_2A();
         Serial.println("INA219 inicializado");
     }
     

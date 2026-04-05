@@ -150,7 +150,7 @@ bool Comunicaciones::conectarMQTT(PubSubClient& client, TinyGsmClient& gsmClient
     int intento = 0;
     while (!client.connect(MQTT_CLIENT_ID) && intento < 5) {
         Serial.print(".");
-        delay(min(1000 * pow(2, intento), 5000));
+        delay(min(1000 * (int)pow(2, intento), 5000));
         intento++;
     }
     Serial.println();
